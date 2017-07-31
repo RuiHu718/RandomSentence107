@@ -9,8 +9,10 @@
  
 #include <map>
 #include <fstream>
+#include <vector>
 #include "definition.h"
 #include "production.h"
+#include "random.h"
 using namespace std;
 
 /**
@@ -38,6 +40,30 @@ static void readGrammar(ifstream& infile, map<string, Definition>& grammar)
     grammar[def.getNonterminal()] = def;
   }
 }
+
+/**
+ * Expands given nunterminal according to provided grammar
+ * @param string name of the nonterminal
+ * @param grammar a reference to a STL map
+ */
+static void expandNonterminal(string nonterminal, map<string, Definition>& grammar,
+			      vector<string>& result) 
+{
+  Definition definition = grammar[nonterminal];
+  Production chosen = definition.getRandomProduction();
+  Production::const_iterator curr = chosen.begin();
+  Production::const_iterator end = chosen.end();
+  for (; curr != end; ++curr) {
+    map<string, Definition>::const_iterator found = grammar.find(*curr);
+    if (found == grammar.end()) { // current string is a terminal term
+      result.push_back(*curr);
+      result.push_back(" ");	// add space in between
+    } else {
+      expandNonterminal(*curr, grammar, result);
+    }
+  }
+}
+
 
 /**
  * Performs the rudimentary error checking needed to confirm that
@@ -74,6 +100,20 @@ int main(int argc, char *argv[])
   readGrammar(grammarFile, grammar);
   cout << "The grammar file called \"" << argv[1] << "\" contains "
        << grammar.size() << " definitions." << endl;
+
+  vector<string> result;
+  expandNonterminal("<start>", grammar, result);
+  vector<string>::const_iterator curr = result.begin();
+  vector<string>::const_iterator end = result.end();
+  for (; curr != end; ++curr) {
+    cout << *curr << " ";
+  }
+
+  // map<string, Definition>::const_iterator curr = grammar.begin();
+  // while (curr != grammar.end()) {
+  //   cout << curr -> first << endl;
+  //   ++curr;
+  // }
   
   return 0;
 }
