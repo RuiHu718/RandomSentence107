@@ -64,6 +64,13 @@ static void expandNonterminal(string nonterminal, map<string, Definition>& gramm
   }
 }
 
+/* wrapper function for generating random sentence */
+static void generateRandomSentence(map<string, Definition>& grammar, vector<string> & result)
+{
+  string starting = "<start>";
+  expandNonterminal(starting, grammar, result);
+}  
+
 
 /**
  * Performs the rudimentary error checking needed to confirm that
@@ -102,18 +109,13 @@ int main(int argc, char *argv[])
        << grammar.size() << " definitions." << endl;
 
   vector<string> result;
-  expandNonterminal("<start>", grammar, result);
+  generateRandomSentence(grammar, result);
+
   vector<string>::const_iterator curr = result.begin();
   vector<string>::const_iterator end = result.end();
   for (; curr != end; ++curr) {
-    cout << *curr << " ";
+    cout << *curr ;
   }
 
-  // map<string, Definition>::const_iterator curr = grammar.begin();
-  // while (curr != grammar.end()) {
-  //   cout << curr -> first << endl;
-  //   ++curr;
-  // }
-  
   return 0;
 }
